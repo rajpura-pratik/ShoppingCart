@@ -13,7 +13,9 @@ namespace ShoppingCart
 		}
 		public override decimal CalculatePrice()
 		{
-			throw new NotImplementedException();
+			decimal total = base.CalculatePrice();
+			total = total - (qty * 5);
+			return total;
 		}
 	}
 }
