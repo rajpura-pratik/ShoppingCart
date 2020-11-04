@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace ShoppingCart
 {
-   public class Cart : ICart, IPriceCalculator
+    public class Cart : ICart, IPriceCalculator
     {
         private readonly IEnumerable<Item> items;
 
@@ -19,12 +19,26 @@ namespace ShoppingCart
 
         public decimal CalculatePrice()
         {
-            throw new NotImplementedException();
+            decimal total = 0;
+            total = scannedItems.Sum(i => ItemPrice(i));
+            return total;
+        }
+
+        private int ItemPrice(char sku)
+        {
+            return items.Single(p => p.SKU == sku).Price;
         }
 
         public ICart Scan(string SKU)
         {
-            throw new NotImplementedException();
+            if (!String.IsNullOrEmpty(SKU.ToString()))
+            {                
+                scannedItems = SKU
+                    .ToCharArray()
+                    .Where(scannedSKU => items.Any(i => i.SKU == scannedSKU))
+                    .ToArray();
+            }
+            return this;
         }
     }
 }
