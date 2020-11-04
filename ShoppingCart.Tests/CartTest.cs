@@ -40,5 +40,20 @@ namespace ShoppingCart.Tests
             decimal actual = priceCalculator.CalculatePrice();
             Assert.Equal(expected, actual);
         }
+
+        [Theory]
+        [InlineData("AAAAABBBBBC", 370)] //SCENARIO B
+        [InlineData("AAABBBBBCD", 280)] //SCENARIO C
+        public void Scan_discounted_items_and_get_correct_price(string scan, int expected)
+        {
+            IPriceCalculator priceCalculator = (IPriceCalculator)cart;
+
+            cart.Scan(scan);
+            priceCalculator = new SkuADiscountDecorator(cart.ScannedItems.Where(x => x == 'A').Count(), priceCalculator);
+            priceCalculator = new SkuBDiscountDecorator(cart.ScannedItems.Where(x => x == 'B').Count(), priceCalculator);
+            priceCalculator = new SkuCandDDiscountDecorator(cart.ScannedItems.Where(x => x == 'C').Count(), cart.ScannedItems.Where(x => x == 'D').Count(), priceCalculator);
+            decimal actual = priceCalculator.CalculatePrice();
+            Assert.Equal(expected, actual);
+        }
     }
 }
