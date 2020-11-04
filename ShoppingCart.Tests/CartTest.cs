@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 namespace ShoppingCart.Tests
 {
@@ -25,6 +26,19 @@ namespace ShoppingCart.Tests
             cart.Scan("");
             decimal actual = priceCalculator.CalculatePrice();
             Assert.Equal(0, actual);
+        }
+
+        [Theory]
+        [InlineData("ABC", 100)] //SCENARIO A      
+        public void Scan_each_item_get_correct_price(string scan, int expected)
+        {
+            IPriceCalculator priceCalculator = (IPriceCalculator)cart;
+
+            cart.Scan(scan);
+            priceCalculator = new SkuADiscountDecorator(cart.ScannedItems.Where(x => x == 'A').Count(), priceCalculator);
+            priceCalculator = new SkuBDiscountDecorator(cart.ScannedItems.Where(x => x == 'B').Count(), priceCalculator);
+            decimal actual = priceCalculator.CalculatePrice();
+            Assert.Equal(expected, actual);
         }
     }
 }
